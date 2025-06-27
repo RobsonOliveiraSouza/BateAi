@@ -1,11 +1,12 @@
 package com.bateai.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class CadastroFuncionarioDTO {
+
+    @NotBlank(message = "O nome é obrigatório")
     private String nome;
     private String email;
     private String senha;
