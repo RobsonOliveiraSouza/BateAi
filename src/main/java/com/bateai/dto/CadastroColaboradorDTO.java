@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class CadastroCoordenadorDTO {
+public class CadastroColaboradorDTO {
     @NotBlank
     private String nome;
 
@@ -20,7 +20,10 @@ public class CadastroCoordenadorDTO {
     private String cpf;
 
     private String telefone;
+    private String setor;
 
     @NotBlank
     private String cnpjEmpresa;
+
+    private Long coordenadorId;
 }

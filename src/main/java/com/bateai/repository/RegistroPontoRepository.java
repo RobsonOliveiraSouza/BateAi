@@ -8,13 +8,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RegistroPontoRepository extends JpaRepository<RegistroPonto, Long> {
-    List<RegistroPonto> findByFuncionario(Usuario funcionario);
+    List<RegistroPonto> findByColaborador(Usuario colaborador);
 
-    List<RegistroPonto> findByFuncionarioAndDataHoraBetween(
-            Usuario funcionario,
+    List<RegistroPonto> findByColaboradorAndDataHoraBetween(
+            Usuario colaborador,
             LocalDateTime inicio,
             LocalDateTime fim
     );
 
-    RegistroPonto findTopByFuncionarioOrderByDataHoraDesc();
+    RegistroPonto findTopByColaboradorOrderByDataHoraDesc(Usuario colaborador);
 }

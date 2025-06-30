@@ -1,6 +1,6 @@
 package com.bateai.entity;
 
-import com.bateai.enums.TipoRegistro;
+import com.bateai.entity.enums.TipoRegistro;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "registros_ponto")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegistroPonto {
@@ -22,8 +21,8 @@ public class RegistroPonto {
 
     @NotNull(message = "O funcionário é obrigatório")
     @ManyToOne
-    @JoinColumn(name = "funcionario_id", nullable = false)
-    private Usuario funcionario;
+    @JoinColumn(name = "colaborador_id", nullable = false)
+    private Usuario colaborador;
 
     @NotNull(message = "A data e hora são obrigatórias")
     @Column(nullable = false)

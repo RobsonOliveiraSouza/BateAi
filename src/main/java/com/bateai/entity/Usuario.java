@@ -1,6 +1,6 @@
 package com.bateai.entity;
 
-import com.bateai.enums.TipoUsuario;
+import com.bateai.entity.enums.TipoUsuario;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,7 +10,6 @@ import lombok.*;
 @Entity
 @Table(name = "usuarios")
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Usuario {
@@ -32,8 +31,25 @@ public class Usuario {
     @Column(nullable = false)
     private String senha;
 
+    @NotBlank
+    @Column(nullable = false, unique = true)
+    private String cpf;
+
+    @Column
+    private String telefone;
+
+    @Column
+    private String setor;
+
     @Enumerated(EnumType.STRING)
     @NotNull(message = "O tipo de usuário é obrigatório")
     @Column(name = "tipo_usuario", nullable = false)
-    private TipoUsuario tipoUsuario; // COORDENADOR ou FUNCIONARIO
+    private TipoUsuario tipoUsuario; // COORDENADOR ou COLABORADOR
+
+    @ManyToOne
+    @JoinColumn(name = "empresa_id")
+    private Empresa empresa;
+
+    @Column(name = "vinculo_aprovado")
+    private boolean vinculoAprovado = false;
 }

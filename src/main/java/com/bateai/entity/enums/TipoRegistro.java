@@ -1,4 +1,4 @@
-package com.bateai.enums;
+package com.bateai.entity.enums;
 
 public enum TipoRegistro {
     ENTRADA,
