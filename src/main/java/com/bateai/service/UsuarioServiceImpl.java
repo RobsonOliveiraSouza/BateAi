@@ -2,6 +2,8 @@ package com.bateai.service;
 
 import com.bateai.dto.CadastroCoordenadorDTO;
 import com.bateai.dto.CadastroColaboradorDTO;
+import com.bateai.dto.UsuarioResponseDTO;
+import com.bateai.dto.EmpresaResumoDTO;
 import com.bateai.entity.Empresa;
 import com.bateai.entity.Usuario;
 import com.bateai.entity.enums.TipoUsuario;
@@ -23,12 +25,12 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public Usuario cadastrarCoordenador(CadastroCoordenadorDTO dto) {
+    public UsuarioResponseDTO cadastrarCoordenador(CadastroCoordenadorDTO dto) {
         if (usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("E-mail já cadastrado");
         }
 
-        Empresa empresa = empresaRepository.findByCnpj(dto.getCnpjEmpresa())
+        Empresa empresa = empresaRepository.findById(dto.getEmpresaId())
                 .orElseThrow(() -> new IllegalArgumentException("Empresa não encontrada"));
 
         Usuario usuario = new Usuario();
@@ -41,16 +43,17 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setTipoUsuario(TipoUsuario.COORDENADOR);
         usuario.setVinculoAprovado(true);
 
-        return usuarioRepository.save(usuario);
+        Usuario salvo = usuarioRepository.save(usuario);
+        return toResponseDTO(salvo);
     }
 
     @Override
-    public Usuario cadastrarColaborador(CadastroColaboradorDTO dto) {
+    public UsuarioResponseDTO cadastrarColaborador(CadastroColaboradorDTO dto) {
         if (usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("E-mail já cadastrado");
         }
 
-        Empresa empresa = empresaRepository.findByCnpj(dto.getCnpjEmpresa())
+        Empresa empresa = empresaRepository.findById(dto.getEmpresaId())
                 .orElseThrow(() -> new IllegalArgumentException("Empresa não encontrada"));
 
         Usuario usuario = new Usuario();
@@ -62,9 +65,30 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setSetor(dto.getSetor());
         usuario.setTipoUsuario(TipoUsuario.COLABORADOR);
         usuario.setEmpresa(empresa);
-        usuario.setVinculoAprovado(false); // precisa da aprovação
+        usuario.setVinculoAprovado(false);
 
-        return usuarioRepository.save(usuario);
+        Usuario salvo = usuarioRepository.save(usuario);
+        return toResponseDTO(salvo);
+    }
+
+    private UsuarioResponseDTO toResponseDTO(Usuario usuario) {
+        Empresa empresa = usuario.getEmpresa();
+        EmpresaResumoDTO empresaDTO = new EmpresaResumoDTO(
+                empresa.getId(),
+                empresa.getNomeFantasia(),
+                empresa.getCnpj()
+        );
+
+        return new UsuarioResponseDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getCpf(),
+                usuario.getTelefone(),
+                usuario.getSetor(),
+                usuario.getTipoUsuario(),
+                empresaDTO
+        );
     }
 
     @Override

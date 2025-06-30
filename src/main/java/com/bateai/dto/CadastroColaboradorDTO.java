@@ -23,7 +23,7 @@ public class CadastroColaboradorDTO {
     private String setor;
 
     @NotBlank
-    private String cnpjEmpresa;
+    private Long empresaId;
 
     private Long coordenadorId;
 }

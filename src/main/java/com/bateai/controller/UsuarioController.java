@@ -2,6 +2,7 @@ package com.bateai.controller;
 
 import com.bateai.dto.CadastroCoordenadorDTO;
 import com.bateai.dto.CadastroColaboradorDTO;
+import com.bateai.dto.UsuarioResponseDTO;
 import com.bateai.entity.Usuario;
 import com.bateai.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,18 +21,20 @@ public class UsuarioController {
     }
 
     @PostMapping("/cadastrar-coordenador")
-    public Usuario cadastrarCoordenador(@RequestBody CadastroCoordenadorDTO dto) {
-        return usuarioService.cadastrarCoordenador(dto);
+    public ResponseEntity<UsuarioResponseDTO> cadastrarCoordenador(@RequestBody CadastroCoordenadorDTO dto) {
+        UsuarioResponseDTO response = usuarioService.cadastrarCoordenador(dto);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/cadastrar-colaborador")
-    public Usuario cadastrarColaborador(@RequestBody CadastroColaboradorDTO dto) {
-        return usuarioService.cadastrarColaborador(dto);
+    public ResponseEntity<UsuarioResponseDTO> cadastrarColaborador(@RequestBody CadastroColaboradorDTO dto) {
+        UsuarioResponseDTO response = usuarioService.cadastrarColaborador(dto);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletarUsuario(@PathVariable Long id) {
+    public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
         usuarioService.deletarUsuario(id);
-        return ResponseEntity.ok("Usuário excluído com sucesso.");
+        return ResponseEntity.noContent().build();
     }
 }

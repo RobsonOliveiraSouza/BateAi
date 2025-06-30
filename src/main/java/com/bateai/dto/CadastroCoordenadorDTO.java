@@ -22,5 +22,5 @@ public class CadastroCoordenadorDTO {
     private String telefone;
 
     @NotBlank
-    private String cnpjEmpresa;
+    private Long empresaId;
 }
