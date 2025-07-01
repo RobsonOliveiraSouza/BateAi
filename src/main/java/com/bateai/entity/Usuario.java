@@ -1,5 +1,6 @@
 package com.bateai.entity;
 
+import com.bateai.entity.enums.StatusVinculo;
 import com.bateai.entity.enums.TipoUsuario;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -50,6 +51,7 @@ public class Usuario {
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
 
-    @Column(name = "vinculo_aprovado")
-    private boolean vinculoAprovado = false;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusVinculo statusVinculo;
 }

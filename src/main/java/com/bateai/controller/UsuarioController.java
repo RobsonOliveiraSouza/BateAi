@@ -3,11 +3,12 @@ package com.bateai.controller;
 import com.bateai.dto.CadastroCoordenadorDTO;
 import com.bateai.dto.CadastroColaboradorDTO;
 import com.bateai.dto.UsuarioResponseDTO;
-import com.bateai.entity.Usuario;
 import com.bateai.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -37,4 +38,17 @@ public class UsuarioController {
         usuarioService.deletarUsuario(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/aprovar-vinculo/{idColaborador}")
+    public ResponseEntity<Void> aprovarVinculo(@PathVariable Long idColaborador) {
+        usuarioService.aprovarVinculo(idColaborador);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/pendentes")
+    public ResponseEntity<List<UsuarioResponseDTO>> listarPendentes(@RequestParam Long empresaId) {
+        List<UsuarioResponseDTO> pendentes = usuarioService.listarColaboradoresPendentes(empresaId);
+        return ResponseEntity.ok(pendentes);
+    }
+
 }

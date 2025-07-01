@@ -3,21 +3,22 @@ package com.bateai.controller;
 import com.bateai.dto.EmpresaDTO;
 import com.bateai.entity.Empresa;
 import com.bateai.service.EmpresaService;
+import com.bateai.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/empresas")
 public class EmpresaController {
 
     private final EmpresaService empresaService;
+    private final UsuarioService usuarioService;
 
     @Autowired
-    public EmpresaController(EmpresaService empresaService) {
+    public EmpresaController(EmpresaService empresaService, UsuarioService usuarioService) {
         this.empresaService = empresaService;
+        this.usuarioService = usuarioService;
     }
 
     @PostMapping("/cadastrar")

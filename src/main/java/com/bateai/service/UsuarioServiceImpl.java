@@ -6,11 +6,14 @@ import com.bateai.dto.UsuarioResponseDTO;
 import com.bateai.dto.EmpresaResumoDTO;
 import com.bateai.entity.Empresa;
 import com.bateai.entity.Usuario;
+import com.bateai.entity.enums.StatusVinculo;
 import com.bateai.entity.enums.TipoUsuario;
 import com.bateai.repository.EmpresaRepository;
 import com.bateai.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
@@ -41,7 +44,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setTelefone(dto.getTelefone());
         usuario.setEmpresa(empresa);
         usuario.setTipoUsuario(TipoUsuario.COORDENADOR);
-        usuario.setVinculoAprovado(true);
+        usuario.setStatusVinculo(StatusVinculo.APROVADO);
 
         Usuario salvo = usuarioRepository.save(usuario);
         return toResponseDTO(salvo);
@@ -63,9 +66,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setCpf(dto.getCpf());
         usuario.setTelefone(dto.getTelefone());
         usuario.setSetor(dto.getSetor());
-        usuario.setTipoUsuario(TipoUsuario.COLABORADOR);
         usuario.setEmpresa(empresa);
-        usuario.setVinculoAprovado(false);
+        usuario.setTipoUsuario(TipoUsuario.COLABORADOR);
+        usuario.setStatusVinculo(StatusVinculo.PENDENTE);
 
         Usuario salvo = usuarioRepository.save(usuario);
         return toResponseDTO(salvo);
@@ -87,9 +90,49 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuario.getTelefone(),
                 usuario.getSetor(),
                 usuario.getTipoUsuario(),
+                usuario.getStatusVinculo(),
                 empresaDTO
         );
     }
+
+    @Override
+    public void aprovarVinculo(Long idColaborador) {
+        Usuario colaborador = usuarioRepository.findById(idColaborador)
+                .orElseThrow(() -> new IllegalArgumentException("Colaborador não encontrado"));
+
+        if (colaborador.getTipoUsuario() != TipoUsuario.COLABORADOR) {
+            throw new IllegalArgumentException("Somente colaboradores podem ter o vínculo aprovado");
+        }
+
+        colaborador.setStatusVinculo(StatusVinculo.APROVADO);
+        usuarioRepository.save(colaborador);
+    }
+
+    public void rejeitarVinculo(Long idColaborador) {
+        Usuario colaborador = usuarioRepository.findById(idColaborador)
+                .orElseThrow(() -> new IllegalArgumentException("Colaborador não encontrado"));
+
+        if (colaborador.getTipoUsuario() != TipoUsuario.COLABORADOR) {
+            throw new IllegalArgumentException("Somente colaboradores podem ter o vínculo rejeitado");
+        }
+
+        colaborador.setStatusVinculo(StatusVinculo.REJEITADO);
+        usuarioRepository.save(colaborador);
+    }
+
+    @Override
+    public List<UsuarioResponseDTO> listarColaboradoresPendentes(Long empresaId) {
+        List<Usuario> pendentes = usuarioRepository.findByEmpresaIdAndTipoUsuarioAndStatusVinculo(
+                empresaId,
+                TipoUsuario.COLABORADOR,
+                StatusVinculo.PENDENTE
+        );
+
+        return pendentes.stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
 
     @Override
     public void deletarUsuario(Long id) {

@@ -1,5 +1,6 @@
 package com.bateai.dto;
 
+import com.bateai.entity.enums.StatusVinculo;
 import com.bateai.entity.enums.TipoUsuario;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ public class UsuarioResponseDTO {
     private String telefone;
     private String setor;
     private TipoUsuario tipoUsuario;
+    private StatusVinculo statusVinculo;
     private EmpresaResumoDTO empresa;
 }
 
