@@ -1,8 +1,11 @@
 package com.bateai.service;
 
 import com.bateai.dto.RegistroPontoDTO;
+import com.bateai.dto.RegistroPontoResponseDTO;
+import com.bateai.dto.UsuarioResumoDTO;
 import com.bateai.entity.RegistroPonto;
 import com.bateai.entity.Usuario;
+import com.bateai.entity.enums.StatusVinculo;
 import com.bateai.entity.enums.TipoUsuario;
 import com.bateai.repository.RegistroPontoRepository;
 import com.bateai.repository.UsuarioRepository;
@@ -21,12 +24,34 @@ public class RegistroPontoService {
     @Autowired
     private RegistroPontoRepository registroPontoRepository;
 
-    public RegistroPonto registrarPonto(RegistroPontoDTO dto) {
+    private RegistroPontoResponseDTO toResponseDTO(RegistroPonto ponto) {
+        Usuario u = ponto.getColaborador();
+
+        UsuarioResumoDTO colaboradorDTO = new UsuarioResumoDTO(
+                u.getId(),
+                u.getNome(),
+                u.getEmail()
+        );
+
+        return new RegistroPontoResponseDTO(
+                ponto.getId(),
+                ponto.getDataHora(),
+                ponto.getTipoRegistro().name(),
+                ponto.getLocalizacao(),
+                colaboradorDTO
+        );
+    }
+
+    public RegistroPontoResponseDTO registrarPonto(RegistroPontoDTO dto) {
         Usuario colaborador = usuarioRepository.findById(dto.getColaboradorId())
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário não encontrado"));
 
         if (colaborador.getTipoUsuario() != TipoUsuario.COLABORADOR) {
             throw new IllegalArgumentException("Somente funcionários podem bater ponto");
+        }
+
+        if (colaborador.getStatusVinculo() != StatusVinculo.APROVADO) {
+            throw new IllegalStateException("Usuário não autorizado a bater ponto.");
         }
 
         RegistroPonto ponto = new RegistroPonto();
@@ -35,7 +60,8 @@ public class RegistroPontoService {
         ponto.setDataHora(LocalDateTime.now());
         ponto.setLocalizacao(dto.getLocalizacao());
 
-        return registroPontoRepository.save(ponto);
+        RegistroPonto salvo = registroPontoRepository.save(ponto);
+        return toResponseDTO(salvo);
     }
 
     public List<RegistroPonto> listarPorColaborador(Long colaboradorId) {

@@ -1,6 +1,7 @@
 package com.bateai.controller;
 
 import com.bateai.dto.RegistroPontoDTO;
+import com.bateai.dto.RegistroPontoResponseDTO;
 import com.bateai.entity.RegistroPonto;
 import com.bateai.service.RegistroPontoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,8 @@ public class RegistroPontoController {
     private RegistroPontoService registroPontoService;
 
     @PostMapping("/registrar")
-    public ResponseEntity<RegistroPonto> registrarPonto(@RequestBody RegistroPontoDTO dto) {
-        RegistroPonto ponto = registroPontoService.registrarPonto(dto);
-        return ResponseEntity.ok(ponto);
+    public ResponseEntity<RegistroPontoResponseDTO> registrarPonto(@RequestBody RegistroPontoDTO dto) {
+        return ResponseEntity.ok(registroPontoService.registrarPonto(dto));
     }
 
     @GetMapping("/colaborador/{id}")

@@ -2,6 +2,7 @@ package com.bateai.controller;
 
 import com.bateai.dto.CadastroCoordenadorDTO;
 import com.bateai.dto.CadastroColaboradorDTO;
+import com.bateai.dto.DashboardDTO;
 import com.bateai.dto.UsuarioResponseDTO;
 import com.bateai.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,4 +52,24 @@ public class UsuarioController {
         return ResponseEntity.ok(pendentes);
     }
 
+    @GetMapping("/aprovados")
+    public ResponseEntity<List<UsuarioResponseDTO>> listarColaboradoresAprovados(@RequestParam Long empresaId) {
+        return ResponseEntity.ok(usuarioService.listarColaboradoresAprovados(empresaId));
+    }
+
+    @GetMapping("/colaboradores")
+    public ResponseEntity<List<UsuarioResponseDTO>> listarTodosColaboradores(@RequestParam Long empresaId) {
+        return ResponseEntity.ok(usuarioService.listarTodosColaboradores(empresaId));
+    }
+
+    @PutMapping("/{id}/rejeitar")
+    public ResponseEntity<Void> rejeitarVinculo(@PathVariable Long id) {
+        usuarioService.rejeitarVinculo(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<DashboardDTO> dashboard(@RequestParam Long empresaId) {
+        return ResponseEntity.ok(usuarioService.gerarDashboard(empresaId));
+    }
 }

@@ -1,9 +1,6 @@
 package com.bateai.service;
 
-import com.bateai.dto.CadastroCoordenadorDTO;
-import com.bateai.dto.CadastroColaboradorDTO;
-import com.bateai.dto.UsuarioResponseDTO;
-import com.bateai.dto.EmpresaResumoDTO;
+import com.bateai.dto.*;
 import com.bateai.entity.Empresa;
 import com.bateai.entity.Usuario;
 import com.bateai.entity.enums.StatusVinculo;
@@ -133,6 +130,18 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .toList();
     }
 
+    @Override
+    public List<UsuarioResponseDTO> listarColaboradoresAprovados(Long empresaId) {
+        List<Usuario> usuarios = usuarioRepository.findByEmpresaIdAndTipoUsuarioAndStatusVinculo(
+                empresaId, TipoUsuario.COLABORADOR, StatusVinculo.APROVADO
+        );
+        return usuarios.stream().map(this::toResponseDTO).toList();
+    }
+
+    public List<UsuarioResponseDTO> listarTodosColaboradores(Long empresaId) {
+        return usuarioRepository.findByEmpresaIdAndTipoUsuario(empresaId, TipoUsuario.COLABORADOR)
+                .stream().map(this::toResponseDTO).toList();
+    }
 
     @Override
     public void deletarUsuario(Long id) {
@@ -141,4 +150,15 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
         usuarioRepository.deleteById(id);
     }
+
+    @Override
+    public DashboardDTO gerarDashboard(Long empresaId) {
+        long total = usuarioRepository.countByEmpresaIdAndTipoUsuario(empresaId, TipoUsuario.COLABORADOR);
+        long aprovados = usuarioRepository.countByEmpresaIdAndTipoUsuarioAndStatusVinculo(empresaId, TipoUsuario.COLABORADOR, StatusVinculo.APROVADO);
+        long pendentes = usuarioRepository.countByEmpresaIdAndTipoUsuarioAndStatusVinculo(empresaId, TipoUsuario.COLABORADOR, StatusVinculo.PENDENTE);
+        long rejeitados = usuarioRepository.countByEmpresaIdAndTipoUsuarioAndStatusVinculo(empresaId, TipoUsuario.COLABORADOR, StatusVinculo.REJEITADO);
+
+        return new DashboardDTO(total, aprovados, pendentes, rejeitados);
+    }
+
 }
