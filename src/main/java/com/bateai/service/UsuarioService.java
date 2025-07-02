@@ -13,6 +13,7 @@ public interface UsuarioService {
     void aprovarVinculo(Long idColaborador);
     void rejeitarVinculo(Long idColaborador);
     void deletarUsuario(Long id);
+    void redefinirSenha(Long id, String novaSenha);
     List<UsuarioResponseDTO> listarColaboradoresPendentes(Long empresaId);
     List<UsuarioResponseDTO> listarColaboradoresAprovados(Long empresaId);
     List<UsuarioResponseDTO> listarTodosColaboradores(Long empresaId);

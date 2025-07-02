@@ -18,4 +18,7 @@ public class EmpresaDTO {
     @NotBlank
     @Email
     private String emailResponsavel;
+
+    @NotBlank
+    private String senhaResponsavel;
 }

@@ -1,5 +1,6 @@
 package com.bateai.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -25,6 +26,11 @@ public class Empresa {
     @Column(nullable = false, unique = true)
     @Email
     private String emailResponsavel;
+
+    @NotBlank
+    @Column(nullable = false)
+    @JsonIgnore
+    private String senhaResponsavel;
 
     @Column
     private boolean emailConfirmado = false;

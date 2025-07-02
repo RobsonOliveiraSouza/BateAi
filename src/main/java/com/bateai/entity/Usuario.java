@@ -2,6 +2,7 @@ package com.bateai.entity;
 
 import com.bateai.entity.enums.StatusVinculo;
 import com.bateai.entity.enums.TipoUsuario;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -29,6 +30,7 @@ public class Usuario {
     private String email;
 
     @NotBlank(message = "A senha é obrigatória")
+    @JsonIgnore
     @Column(nullable = false)
     private String senha;
 

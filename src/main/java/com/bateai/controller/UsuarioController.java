@@ -1,9 +1,6 @@
 package com.bateai.controller;
 
-import com.bateai.dto.CadastroCoordenadorDTO;
-import com.bateai.dto.CadastroColaboradorDTO;
-import com.bateai.dto.DashboardDTO;
-import com.bateai.dto.UsuarioResponseDTO;
+import com.bateai.dto.*;
 import com.bateai.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +35,12 @@ public class UsuarioController {
     public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
         usuarioService.deletarUsuario(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/usuarios/redefinir-senha/{id}")
+    public ResponseEntity<?> redefinirSenha(@PathVariable Long id, @RequestBody NovaSenhaDTO dto) {
+        usuarioService.redefinirSenha(id, dto.getNovaSenha());
+        return ResponseEntity.ok("Senha redefinida com sucesso");
     }
 
     @PutMapping("/aprovar-vinculo/{idColaborador}")
