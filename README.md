@@ -4,9 +4,14 @@
 
 ## ✅ Funcionalidades atuais
 
-- Cadastro de usuários do tipo **Coordenador** e **Funcionário**
+- Cadastro de usuários do tipo **Coordenador** e **Colaborador**
+- Cadastro de empresas
 - Armazenamento de usuários em banco de dados persistente (PostgreSQL)
+- Registro de ponto para **ENTRADA** e **SAIDA**
 - Criação automática da tabela `usuarios` com mapeamento por enum (`TipoUsuario`)
+- Busca de colaboradores pendentes para aprovação
+- Aprovação de vinculo entre coordenador e colaborador
+- Visualização de dashboard com informações dos usuários e suas situações
 
 ## 📁 Estrutura do Projeto
 
