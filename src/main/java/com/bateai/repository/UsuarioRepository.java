@@ -6,6 +6,7 @@ import com.bateai.entity.enums.TipoUsuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
@@ -14,4 +15,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     List<Usuario> findByEmpresaIdAndTipoUsuario(Long empresaId, TipoUsuario tipo);
     long countByEmpresaIdAndTipoUsuario(Long empresaId, TipoUsuario tipo);
     long countByEmpresaIdAndTipoUsuarioAndStatusVinculo(Long empresaId, TipoUsuario tipo, StatusVinculo status);
+    Optional<Usuario> findByEmail(String email);
 }

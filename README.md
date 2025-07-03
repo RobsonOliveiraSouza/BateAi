@@ -123,6 +123,17 @@ Response do payload de cadastro de ponto (ponto batido):
 - **Swagger**: Documentação da API REST
 - **Git**: Controle de versionamento do código-fonte
 
+## 🔐 Configuração do Ambiente
+
+Antes de executar o projeto, crie o arquivo `src/main/resources/application.properties` com base no `application-example.properties`.
+
+Ou copie com o comando:
+
+```bash
+cp src/main/resources/application-example.properties src/main/resources/application.properties
+```
+Em seguida, edite o arquivo `application.properties` com as informações do seu banco de dados PostgreSQL e a chave secreta JWT (jwt.secret)
+
 ## ⚙️ Como executar
 
 1. Certifique-se de que o PostgreSQL está rodando e o banco `bateai` foi criado.
