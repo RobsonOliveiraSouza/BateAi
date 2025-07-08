@@ -1,8 +1,10 @@
 package com.bateai.security;
 
+import com.bateai.entity.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -18,12 +20,23 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private Long expirationMs;
 
-    public String generateToken(String email) {
+    public String generateToken(Usuario usuario) {
         return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(new java.util.Date())
-                .setExpiration(new java.util.Date(System.currentTimeMillis() + expirationMs))
+                .setSubject(usuario.getEmail())
+                .claim("role", usuario.getTipoUsuario().name())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(io.jsonwebtoken.SignatureAlgorithm.HS256, secret)
+                .compact();
+    }
+
+    public String generateRefreshToken(Usuario usuario) {
+        return Jwts.builder()
+                .setSubject(usuario.getEmail())
+                .claim("role", usuario.getTipoUsuario().name())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7))
+                .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
 
@@ -37,6 +50,11 @@ public class JwtUtil {
         } catch (JwtException | IllegalArgumentException e) {
             return null;
         }
+    }
+
+    public String extractRole(String token) {
+        Claims claims = extractClaims(token);
+        return claims.get("role", String.class);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {

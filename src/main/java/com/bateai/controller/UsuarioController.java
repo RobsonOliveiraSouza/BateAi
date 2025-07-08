@@ -4,6 +4,7 @@ import com.bateai.dto.*;
 import com.bateai.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class UsuarioController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('COORDENADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
         usuarioService.deletarUsuario(id);
@@ -43,34 +45,40 @@ public class UsuarioController {
         return ResponseEntity.ok("Senha redefinida com sucesso");
     }
 
+    @PreAuthorize("hasRole('COORDENADOR')")
     @PutMapping("/aprovar-vinculo/{idColaborador}")
     public ResponseEntity<Void> aprovarVinculo(@PathVariable Long idColaborador) {
         usuarioService.aprovarVinculo(idColaborador);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('COORDENADOR')")
     @GetMapping("/pendentes")
     public ResponseEntity<List<UsuarioResponseDTO>> listarPendentes(@RequestParam Long empresaId) {
         List<UsuarioResponseDTO> pendentes = usuarioService.listarColaboradoresPendentes(empresaId);
         return ResponseEntity.ok(pendentes);
     }
 
+    @PreAuthorize("hasRole('COORDENADOR')")
     @GetMapping("/aprovados")
     public ResponseEntity<List<UsuarioResponseDTO>> listarColaboradoresAprovados(@RequestParam Long empresaId) {
         return ResponseEntity.ok(usuarioService.listarColaboradoresAprovados(empresaId));
     }
 
+    @PreAuthorize("hasRole('COORDENADOR')")
     @GetMapping("/colaboradores")
     public ResponseEntity<List<UsuarioResponseDTO>> listarTodosColaboradores(@RequestParam Long empresaId) {
         return ResponseEntity.ok(usuarioService.listarTodosColaboradores(empresaId));
     }
 
+    @PreAuthorize("hasRole('COORDENADOR')")
     @PutMapping("/{id}/rejeitar")
     public ResponseEntity<Void> rejeitarVinculo(@PathVariable Long id) {
         usuarioService.rejeitarVinculo(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('COORDENADOR')")
     @GetMapping("/dashboard")
     public ResponseEntity<DashboardDTO> dashboard(@RequestParam Long empresaId) {
         return ResponseEntity.ok(usuarioService.gerarDashboard(empresaId));
