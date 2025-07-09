@@ -2,6 +2,7 @@ package com.bateai.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -22,5 +23,6 @@ public class CadastroCoordenadorDTO {
     private String telefone;
 
     @NotBlank
+    @NotNull
     private Long empresaId;
 }

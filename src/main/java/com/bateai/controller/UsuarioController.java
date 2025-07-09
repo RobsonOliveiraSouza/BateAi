@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -34,10 +35,11 @@ public class UsuarioController {
 
     @PreAuthorize("hasRole('COORDENADOR')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
-        usuarioService.deletarUsuario(id);
+    public ResponseEntity<Void> deletarUsuario(@PathVariable Long id, Authentication authentication) {
+        usuarioService.deletarUsuario(id, authentication.getName());
         return ResponseEntity.noContent().build();
     }
+
 
     @PutMapping("/usuarios/redefinir-senha/{id}")
     public ResponseEntity<?> redefinirSenha(@PathVariable Long id, @RequestBody NovaSenhaDTO dto) {
@@ -47,8 +49,22 @@ public class UsuarioController {
 
     @PreAuthorize("hasRole('COORDENADOR')")
     @PutMapping("/aprovar-vinculo/{idColaborador}")
-    public ResponseEntity<Void> aprovarVinculo(@PathVariable Long idColaborador) {
-        usuarioService.aprovarVinculo(idColaborador);
+    public ResponseEntity<Void> aprovarVinculo(@PathVariable Long idColaborador, Authentication authentication) {
+        usuarioService.aprovarVinculo(idColaborador, authentication.getName());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('COORDENADOR')")
+    @PutMapping("/{id}/rejeitar")
+    public ResponseEntity<Void> rejeitarVinculo(@PathVariable Long id, Authentication authentication) {
+        usuarioService.rejeitarVinculo(id, authentication.getName());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('COORDENADOR')")
+    @PutMapping("/{id}/remover-vinculo")
+    public ResponseEntity<Void> removerVinculo(@PathVariable Long id, Authentication authentication) {
+        usuarioService.removerVinculo(id, authentication.getName());
         return ResponseEntity.noContent().build();
     }
 
@@ -72,10 +88,10 @@ public class UsuarioController {
     }
 
     @PreAuthorize("hasRole('COORDENADOR')")
-    @PutMapping("/{id}/rejeitar")
-    public ResponseEntity<Void> rejeitarVinculo(@PathVariable Long id) {
-        usuarioService.rejeitarVinculo(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/coordenadores")
+    public ResponseEntity<List<UsuarioResponseDTO>> listarCoordenadores(@RequestParam Long empresaId) {
+        List<UsuarioResponseDTO> coordenadores = usuarioService.listarCoordenadoresPorEmpresa(empresaId);
+        return ResponseEntity.ok(coordenadores);
     }
 
     @PreAuthorize("hasRole('COORDENADOR')")

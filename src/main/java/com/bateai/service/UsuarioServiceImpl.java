@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
@@ -99,29 +100,66 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public void aprovarVinculo(Long idColaborador) {
+    public void aprovarVinculo(Long idColaborador, String coordenadorEmail) {
+        Usuario coordenador = usuarioRepository.findByEmail(coordenadorEmail)
+                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado"));
+
+        if (coordenador.getTipoUsuario() != TipoUsuario.COORDENADOR) {
+            throw new SecurityException("Apenas coordenadores podem aprovar colaboradores");
+        }
+
         Usuario colaborador = usuarioRepository.findById(idColaborador)
                 .orElseThrow(() -> new IllegalArgumentException("Colaborador não encontrado"));
 
-        if (colaborador.getTipoUsuario() != TipoUsuario.COLABORADOR) {
-            throw new IllegalArgumentException("Somente colaboradores podem ter o vínculo aprovado");
+        if (!colaborador.getEmpresa().getId().equals(coordenador.getEmpresa().getId())) {
+            throw new SecurityException("Você só pode aprovar colaboradores da sua empresa");
         }
 
         colaborador.setStatusVinculo(StatusVinculo.APROVADO);
         usuarioRepository.save(colaborador);
     }
 
-    public void rejeitarVinculo(Long idColaborador) {
-        Usuario colaborador = usuarioRepository.findById(idColaborador)
-                .orElseThrow(() -> new IllegalArgumentException("Colaborador não encontrado"));
 
-        if (colaborador.getTipoUsuario() != TipoUsuario.COLABORADOR) {
-            throw new IllegalArgumentException("Somente colaboradores podem ter o vínculo rejeitado");
+    @Override
+    public void rejeitarVinculo(Long idColaborador, String coordenadorEmail) {
+        Usuario coordenador = usuarioRepository.findByEmail(coordenadorEmail)
+                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado"));
+
+        if (coordenador.getTipoUsuario() != TipoUsuario.COORDENADOR) {
+            throw new SecurityException("Apenas coordenadores podem rejeitar colaboradores.");
+        }
+
+        Usuario colaborador = usuarioRepository.findById(idColaborador)
+                .orElseThrow(() -> new IllegalArgumentException("Colaborador não encontrado."));
+
+        if (!colaborador.getEmpresa().getId().equals(coordenador.getEmpresa().getId())) {
+            throw new SecurityException("Você só pode rejeitar colaboradores da sua empresa.");
         }
 
         colaborador.setStatusVinculo(StatusVinculo.REJEITADO);
         usuarioRepository.save(colaborador);
     }
+
+    @Override
+    public void removerVinculo(Long colaboradorId, String emailCoordenador) {
+        Usuario coordenador = usuarioRepository.findByEmail(emailCoordenador)
+                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado"));
+
+        Usuario colaborador = usuarioRepository.findById(colaboradorId)
+                .orElseThrow(() -> new IllegalArgumentException("Colaborador não encontrado"));
+
+        if (!Objects.equals(coordenador.getEmpresa().getId(), colaborador.getEmpresa().getId())) {
+            throw new SecurityException("Você não pode remover vínculo de colaborador de outra empresa.");
+        }
+
+        if (colaborador.getTipoUsuario() != TipoUsuario.COLABORADOR) {
+            throw new IllegalArgumentException("Só é possível remover vínculo de COLABORADORES.");
+        }
+
+        colaborador.setStatusVinculo(StatusVinculo.DESLIGADO);
+        usuarioRepository.save(colaborador);
+    }
+
 
     @Override
     public List<UsuarioResponseDTO> listarColaboradoresPendentes(Long empresaId) {
@@ -150,11 +188,30 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public void deletarUsuario(Long id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new IllegalArgumentException("Usuário não encontrado");
+    public List<UsuarioResponseDTO> listarCoordenadoresPorEmpresa(Long empresaId) {
+        Empresa empresa = empresaRepository.findById(empresaId)
+                .orElseThrow(() -> new IllegalArgumentException("Empresa não encontrada"));
+
+        List<Usuario> coordenadores = usuarioRepository.findByEmpresaAndTipoUsuario(empresa, TipoUsuario.COORDENADOR);
+
+        return coordenadores.stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    @Override
+    public void deletarUsuario(Long idUsuario, String emailCoordenador) {
+        Usuario coordenador = usuarioRepository.findByEmail(emailCoordenador)
+                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado"));
+
+        Usuario usuarioParaDeletar = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        if (!Objects.equals(coordenador.getEmpresa().getId(), usuarioParaDeletar.getEmpresa().getId())) {
+            throw new SecurityException("Você não tem permissão para deletar este usuário.");
         }
-        usuarioRepository.deleteById(id);
+
+        usuarioRepository.deleteById(idUsuario);
     }
 
     public void redefinirSenha(Long id, String novaSenha) {
@@ -174,5 +231,4 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         return new DashboardDTO(total, aprovados, pendentes, rejeitados);
     }
-
 }

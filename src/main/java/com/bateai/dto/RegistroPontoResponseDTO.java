@@ -14,4 +14,5 @@ public class RegistroPontoResponseDTO {
     private String tipoRegistro;
     private String localizacao;
     private UsuarioResumoDTO colaborador;
+    private EmpresaResumoDTO empresa;
 }

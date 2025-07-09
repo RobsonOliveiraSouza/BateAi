@@ -19,10 +19,15 @@ public class RegistroPonto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "O funcionário é obrigatório")
+    @NotNull(message = "O colaborador precisa existir!")
     @ManyToOne
     @JoinColumn(name = "colaborador_id", nullable = false)
     private Usuario colaborador;
+
+    @NotNull(message = "A empresa precisa existir!")
+    @ManyToOne
+    @JoinColumn(name = "empresa_id", nullable = false)
+    private Empresa empresa;
 
     @NotNull(message = "A data e hora são obrigatórias")
     @Column(nullable = false)
@@ -31,7 +36,7 @@ public class RegistroPonto {
     @Enumerated(EnumType.STRING)
     @NotNull(message = "O tipo de registro é obrigatório")
     @Column(name = "tipo_registro", nullable = false)
-    private TipoRegistro tipoRegistro; // ENTRADA ou SAIDA
+    private TipoRegistro tipoRegistro;
 
     @NotBlank(message = "A localização é obrigatória")
     @Column(nullable = false)
