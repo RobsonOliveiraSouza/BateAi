@@ -50,7 +50,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setTelefone(dto.getTelefone());
         usuario.setEmpresa(empresa);
         usuario.setTipoUsuario(TipoUsuario.COORDENADOR);
-        usuario.setStatusVinculo(StatusVinculo.APROVADO);
+        usuario.setStatusVinculo(StatusVinculo.PENDENTE_COORDENADOR);
 
         Usuario salvo = usuarioRepository.save(usuario);
         return toResponseDTO(salvo);
@@ -72,7 +72,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setSetor(dto.getSetor());
         usuario.setEmpresa(empresa);
         usuario.setTipoUsuario(TipoUsuario.COLABORADOR);
-        usuario.setStatusVinculo(StatusVinculo.PENDENTE);
+        usuario.setStatusVinculo(StatusVinculo.PENDENTE_COLABORADOR);
 
         Usuario salvo = usuarioRepository.save(usuario);
         return toResponseDTO(salvo);
@@ -115,7 +115,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new SecurityException("Você só pode aprovar colaboradores da sua empresa");
         }
 
-        colaborador.setStatusVinculo(StatusVinculo.APROVADO);
+        colaborador.setStatusVinculo(StatusVinculo.APROVADO_COLABORADOR);
         usuarioRepository.save(colaborador);
     }
 
@@ -136,7 +136,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new SecurityException("Você só pode rejeitar colaboradores da sua empresa.");
         }
 
-        colaborador.setStatusVinculo(StatusVinculo.REJEITADO);
+        colaborador.setStatusVinculo(StatusVinculo.REJEITADO_COLABORADOR);
         usuarioRepository.save(colaborador);
     }
 
@@ -156,17 +156,16 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new IllegalArgumentException("Só é possível remover vínculo de COLABORADORES.");
         }
 
-        colaborador.setStatusVinculo(StatusVinculo.DESLIGADO);
+        colaborador.setStatusVinculo(StatusVinculo.DESLIGADO_COLABORADOR);
         usuarioRepository.save(colaborador);
     }
-
 
     @Override
     public List<UsuarioResponseDTO> listarColaboradoresPendentes(Long empresaId) {
         List<Usuario> pendentes = usuarioRepository.findByEmpresaIdAndTipoUsuarioAndStatusVinculo(
                 empresaId,
                 TipoUsuario.COLABORADOR,
-                StatusVinculo.PENDENTE
+                StatusVinculo.PENDENTE_COLABORADOR
         );
 
         return pendentes.stream()
@@ -177,7 +176,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public List<UsuarioResponseDTO> listarColaboradoresAprovados(Long empresaId) {
         List<Usuario> usuarios = usuarioRepository.findByEmpresaIdAndTipoUsuarioAndStatusVinculo(
-                empresaId, TipoUsuario.COLABORADOR, StatusVinculo.APROVADO
+                empresaId, TipoUsuario.COLABORADOR, StatusVinculo.APROVADO_COLABORADOR
         );
         return usuarios.stream().map(this::toResponseDTO).toList();
     }
@@ -225,9 +224,9 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public DashboardDTO gerarDashboard(Long empresaId) {
         long total = usuarioRepository.countByEmpresaIdAndTipoUsuario(empresaId, TipoUsuario.COLABORADOR);
-        long aprovados = usuarioRepository.countByEmpresaIdAndTipoUsuarioAndStatusVinculo(empresaId, TipoUsuario.COLABORADOR, StatusVinculo.APROVADO);
-        long pendentes = usuarioRepository.countByEmpresaIdAndTipoUsuarioAndStatusVinculo(empresaId, TipoUsuario.COLABORADOR, StatusVinculo.PENDENTE);
-        long rejeitados = usuarioRepository.countByEmpresaIdAndTipoUsuarioAndStatusVinculo(empresaId, TipoUsuario.COLABORADOR, StatusVinculo.REJEITADO);
+        long aprovados = usuarioRepository.countByEmpresaIdAndTipoUsuarioAndStatusVinculo(empresaId, TipoUsuario.COLABORADOR, StatusVinculo.APROVADO_COLABORADOR);
+        long pendentes = usuarioRepository.countByEmpresaIdAndTipoUsuarioAndStatusVinculo(empresaId, TipoUsuario.COLABORADOR, StatusVinculo.PENDENTE_COLABORADOR);
+        long rejeitados = usuarioRepository.countByEmpresaIdAndTipoUsuarioAndStatusVinculo(empresaId, TipoUsuario.COLABORADOR, StatusVinculo.REJEITADO_COLABORADOR);
 
         return new DashboardDTO(total, aprovados, pendentes, rejeitados);
     }

@@ -65,7 +65,7 @@ public class RegistroPontoServiceImp implements RegistroPontoService {
             throw new IllegalArgumentException("Somente funcionários podem bater ponto");
         }
 
-        if (colaborador.getStatusVinculo() != StatusVinculo.APROVADO) {
+        if (colaborador.getStatusVinculo() != StatusVinculo.APROVADO_COLABORADOR) {
             throw new IllegalStateException("Usuário não autorizado a bater ponto. Status atual: " + colaborador.getStatusVinculo());
         }
 
