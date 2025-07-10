@@ -1,6 +1,7 @@
 package com.bateai.security;
 
 import com.bateai.entity.Usuario;
+import com.bateai.entity.Empresa;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -36,6 +37,26 @@ public class JwtUtil {
                 .claim("role", usuario.getTipoUsuario().name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7))
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
+    }
+
+    public String generateTokenEmpresa(Empresa empresa) {
+        return Jwts.builder()
+                .setSubject(empresa.getEmailResponsavel())
+                .claim("role", "EMPRESA")
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
+    }
+
+    public String generateRefreshTokenEmpresa(Empresa empresa) {
+        return Jwts.builder()
+                .setSubject(empresa.getEmailResponsavel())
+                .claim("role", "EMPRESA")
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }

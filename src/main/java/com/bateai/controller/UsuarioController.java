@@ -48,24 +48,45 @@ public class UsuarioController {
     }
 
     @PreAuthorize("hasRole('COORDENADOR')")
-    @PutMapping("/aprovar-vinculo/{idColaborador}")
-    public ResponseEntity<Void> aprovarVinculo(@PathVariable Long idColaborador, Authentication authentication) {
-        usuarioService.aprovarVinculo(idColaborador, authentication.getName());
-        return ResponseEntity.noContent().build();
+    @PutMapping("/{id}/aprovar-colaborador")
+    public ResponseEntity<String> aprovarVinculoColaborador(@PathVariable Long id, Authentication auth) {
+        usuarioService.aprovarVinculoColaborador(id, auth.getName());
+        return ResponseEntity.ok("Colaborador aprovado com sucesso");
     }
 
     @PreAuthorize("hasRole('COORDENADOR')")
-    @PutMapping("/{id}/rejeitar")
-    public ResponseEntity<Void> rejeitarVinculo(@PathVariable Long id, Authentication authentication) {
-        usuarioService.rejeitarVinculo(id, authentication.getName());
-        return ResponseEntity.noContent().build();
+    @PutMapping("/{id}/rejeitar-colaborador")
+    public ResponseEntity<String> rejeitarVinculoColaborador(@PathVariable Long id, Authentication auth) {
+        usuarioService.rejeitarVinculoColaborador(id, auth.getName());
+        return ResponseEntity.ok("Colaborador rejeitado com sucesso");
     }
 
     @PreAuthorize("hasRole('COORDENADOR')")
-    @PutMapping("/{id}/remover-vinculo")
-    public ResponseEntity<Void> removerVinculo(@PathVariable Long id, Authentication authentication) {
-        usuarioService.removerVinculo(id, authentication.getName());
-        return ResponseEntity.noContent().build();
+    @PutMapping("/{id}/remover-colaborador")
+    public ResponseEntity<String> removerVinculoColaborador(@PathVariable Long id, Authentication auth) {
+        usuarioService.removerVinculoColaborador(id, auth.getName());
+        return ResponseEntity.ok("Vínculo do colaborador removido com sucesso");
+    }
+
+    @PreAuthorize("hasRole('COORDENADOR') or hasRole('EMPRESA')")
+    @PutMapping("/{id}/aprovar-coordenador")
+    public ResponseEntity<String> aprovarVinculoCoordenador(@PathVariable Long id, Authentication auth) {
+        usuarioService.aprovarVinculoCoordenador(id, auth.getName());
+        return ResponseEntity.ok("Coordenador aprovado com sucesso");
+    }
+
+    @PreAuthorize("hasRole('COORDENADOR') or hasRole('EMPRESA')")
+    @PutMapping("/{id}/rejeitar-coordenador")
+    public ResponseEntity<String> rejeitarVinculoCoordenador(@PathVariable Long id, Authentication auth) {
+        usuarioService.rejeitarVinculoCoordenador(id, auth.getName());
+        return ResponseEntity.ok("Coordenador rejeitado com sucesso");
+    }
+
+    @PreAuthorize("hasRole('COORDENADOR') or hasRole('EMPRESA')")
+    @PutMapping("/{id}/remover-coordenador")
+    public ResponseEntity<String> removerVinculoCoordenador(@PathVariable Long id, Authentication auth) {
+        usuarioService.removerVinculoCoordenador(id, auth.getName());
+        return ResponseEntity.ok("Vínculo do coordenador removido com sucesso");
     }
 
     @PreAuthorize("hasRole('COORDENADOR')")

@@ -7,7 +7,7 @@ import com.bateai.entity.RegistroPonto;
 import java.util.List;
 
 public interface RegistroPontoService {
-    RegistroPontoResponseDTO registrarPonto(RegistroPontoDTO dto);
+    RegistroPontoResponseDTO registrarPonto(RegistroPontoDTO dto, String email);
     List<RegistroPontoResponseDTO> listarPontosPorColaborador(Long colaboradorId, String emailCoordenador);
     List<RegistroPontoResponseDTO> listarMeusPontos(String email);
     List<RegistroPontoResponseDTO> listarPontosPorEmpresa(Long empresaId, String emailCoordenador);

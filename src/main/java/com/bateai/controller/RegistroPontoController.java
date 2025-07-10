@@ -19,9 +19,14 @@ public class RegistroPontoController {
     @Autowired
     private RegistroPontoServiceImp registroPontoService;
 
+    @PreAuthorize("hasRole('COORDENADOR') or hasRole('COLABORADOR')")
     @PostMapping("/registrar")
-    public ResponseEntity<RegistroPontoResponseDTO> registrarPonto(@RequestBody RegistroPontoDTO dto) {
-        return ResponseEntity.ok(registroPontoService.registrarPonto(dto));
+    public ResponseEntity<RegistroPontoResponseDTO> registrarPonto(
+            @RequestBody RegistroPontoDTO dto,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+        return ResponseEntity.ok(registroPontoService.registrarPonto(dto, email));
     }
 
     @PreAuthorize("hasRole('COORDENADOR')")

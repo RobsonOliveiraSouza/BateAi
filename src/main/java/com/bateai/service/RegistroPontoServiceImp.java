@@ -56,8 +56,8 @@ public class RegistroPontoServiceImp implements RegistroPontoService {
         );
     }
 
-    public RegistroPontoResponseDTO registrarPonto(RegistroPontoDTO dto) {
-        Usuario colaborador = usuarioRepository.findById(dto.getColaboradorId())
+    public RegistroPontoResponseDTO registrarPonto(RegistroPontoDTO dto, String email) {
+        Usuario colaborador = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Funcionário não encontrado"));
 
         if (colaborador.getTipoUsuario() != TipoUsuario.COLABORADOR &&

@@ -35,6 +35,12 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
     }
 
+    private void validarMesmoContextoEmpresa(Usuario solicitante, Usuario alvo) {
+        if (!solicitante.getEmpresa().getId().equals(alvo.getEmpresa().getId())) {
+            throw new IllegalArgumentException("Usuários de empresas diferentes");
+        }
+    }
+
     @Override
     public UsuarioResponseDTO cadastrarCoordenador(CadastroCoordenadorDTO dto) {
         validarEmailUnico(dto.getEmail());
@@ -100,64 +106,90 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public void aprovarVinculo(Long idColaborador, String coordenadorEmail) {
-        Usuario coordenador = usuarioRepository.findByEmail(coordenadorEmail)
-                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado"));
-
-        if (coordenador.getTipoUsuario() != TipoUsuario.COORDENADOR) {
-            throw new SecurityException("Apenas coordenadores podem aprovar colaboradores");
-        }
-
-        Usuario colaborador = usuarioRepository.findById(idColaborador)
+    public void aprovarVinculoColaborador(Long id, String email) {
+        Usuario coordenador = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+        Usuario colaborador = usuarioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Colaborador não encontrado"));
 
-        if (!colaborador.getEmpresa().getId().equals(coordenador.getEmpresa().getId())) {
-            throw new SecurityException("Você só pode aprovar colaboradores da sua empresa");
-        }
-
+        validarMesmoContextoEmpresa(coordenador, colaborador);
         colaborador.setStatusVinculo(StatusVinculo.APROVADO_COLABORADOR);
         usuarioRepository.save(colaborador);
     }
 
-
     @Override
-    public void rejeitarVinculo(Long idColaborador, String coordenadorEmail) {
-        Usuario coordenador = usuarioRepository.findByEmail(coordenadorEmail)
-                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado"));
+    public void rejeitarVinculoColaborador(Long id, String email) {
+        Usuario coordenador = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+        Usuario colaborador = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Colaborador não encontrado"));
 
-        if (coordenador.getTipoUsuario() != TipoUsuario.COORDENADOR) {
-            throw new SecurityException("Apenas coordenadores podem rejeitar colaboradores.");
-        }
-
-        Usuario colaborador = usuarioRepository.findById(idColaborador)
-                .orElseThrow(() -> new IllegalArgumentException("Colaborador não encontrado."));
-
-        if (!colaborador.getEmpresa().getId().equals(coordenador.getEmpresa().getId())) {
-            throw new SecurityException("Você só pode rejeitar colaboradores da sua empresa.");
-        }
-
+        validarMesmoContextoEmpresa(coordenador, colaborador);
         colaborador.setStatusVinculo(StatusVinculo.REJEITADO_COLABORADOR);
         usuarioRepository.save(colaborador);
     }
 
     @Override
-    public void removerVinculo(Long colaboradorId, String emailCoordenador) {
-        Usuario coordenador = usuarioRepository.findByEmail(emailCoordenador)
-                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado"));
-
-        Usuario colaborador = usuarioRepository.findById(colaboradorId)
+    public void removerVinculoColaborador(Long id, String email) {
+        Usuario coordenador = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+        Usuario colaborador = usuarioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Colaborador não encontrado"));
 
-        if (!Objects.equals(coordenador.getEmpresa().getId(), colaborador.getEmpresa().getId())) {
-            throw new SecurityException("Você não pode remover vínculo de colaborador de outra empresa.");
-        }
-
-        if (colaborador.getTipoUsuario() != TipoUsuario.COLABORADOR) {
-            throw new IllegalArgumentException("Só é possível remover vínculo de COLABORADORES.");
-        }
-
+        validarMesmoContextoEmpresa(coordenador, colaborador);
         colaborador.setStatusVinculo(StatusVinculo.DESLIGADO_COLABORADOR);
         usuarioRepository.save(colaborador);
+    }
+
+    @Override
+    public void aprovarVinculoCoordenador(Long id, String emailAutenticado) {
+        Usuario aprovador = usuarioRepository.findByEmail(emailAutenticado).orElse(null);
+        Usuario coordenador = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado"));
+
+        if (aprovador != null) {
+            validarMesmoContextoEmpresa(aprovador, coordenador);
+
+            if (!aprovador.getStatusVinculo().equals(StatusVinculo.APROVADO_COORDENADOR)) {
+                throw new IllegalArgumentException("Coordenador ainda não aprovado não pode aprovar outro.");
+            }
+            coordenador.setStatusVinculo(StatusVinculo.APROVADO_COORDENADOR);
+            usuarioRepository.save(coordenador);
+            return;
+        }
+
+        Empresa empresa = empresaRepository.findByEmailResponsavel(emailAutenticado)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        if (!empresa.getId().equals(coordenador.getEmpresa().getId())) {
+            throw new IllegalArgumentException("Empresa não pode aprovar coordenador de outra empresa");
+        }
+        coordenador.setStatusVinculo(StatusVinculo.APROVADO_COORDENADOR);
+        usuarioRepository.save(coordenador);
+    }
+
+    @Override
+    public void rejeitarVinculoCoordenador(Long id, String email) {
+        Usuario aprovador = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+        Usuario coordenador = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado"));
+
+        validarMesmoContextoEmpresa(aprovador, coordenador);
+        coordenador.setStatusVinculo(StatusVinculo.REJEITADO_COORDENADOR);
+        usuarioRepository.save(coordenador);
+    }
+
+    @Override
+    public void removerVinculoCoordenador(Long id, String email) {
+        Usuario aprovador = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+        Usuario coordenador = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Coordenador não encontrado"));
+
+        validarMesmoContextoEmpresa(aprovador, coordenador);
+        coordenador.setStatusVinculo(StatusVinculo.DESLIGADO_COORDENADOR);
+        usuarioRepository.save(coordenador);
     }
 
     @Override
