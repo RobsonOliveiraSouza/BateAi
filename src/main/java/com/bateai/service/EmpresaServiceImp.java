@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class EmpresaServiceImp implements EmpresaService {
 
@@ -58,5 +60,9 @@ public class EmpresaServiceImp implements EmpresaService {
                 empresa.getEmailResponsavel(),
                 empresa.isEmailConfirmado()
         );
+    }
+
+    public List<Empresa> buscarPorNomeOuCnpj(String termo) {
+        return empresaRepository.findByNomeFantasiaContainingIgnoreCaseOrCnpjContaining(termo, termo);
     }
 }
