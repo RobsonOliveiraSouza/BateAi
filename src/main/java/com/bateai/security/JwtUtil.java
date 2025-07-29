@@ -26,27 +26,32 @@ public class JwtUtil {
                 .setSubject(usuario.getEmail())
                 .claim("role", usuario.getTipoUsuario().name())
                 .claim("status", usuario.getStatusVinculo().name())
+                .claim("empresaId", usuario.getEmpresa() != null ? usuario.getEmpresa().getId() : null)  // <--- aqui
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(io.jsonwebtoken.SignatureAlgorithm.HS256, secret)
+                .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
+
 
     public String generateRefreshToken(Usuario usuario) {
         return Jwts.builder()
                 .setSubject(usuario.getEmail())
                 .claim("role", usuario.getTipoUsuario().name())
                 .claim("status", usuario.getStatusVinculo().name())
+                .claim("empresaId", usuario.getEmpresa() != null ? usuario.getEmpresa().getId() : null)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
 
+
     public String generateTokenEmpresa(Empresa empresa) {
         return Jwts.builder()
                 .setSubject(empresa.getEmailResponsavel())
                 .claim("role", "EMPRESA")
+                .claim("empresaId", empresa.getId())  // <-- adicionar aqui
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .signWith(SignatureAlgorithm.HS256, secret)
@@ -57,11 +62,13 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(empresa.getEmailResponsavel())
                 .claim("role", "EMPRESA")
+                .claim("empresaId", empresa.getId())  // <-- adicionar aqui
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
+
 
     public String extractUsername(String token) {
         try {

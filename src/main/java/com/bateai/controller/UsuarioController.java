@@ -47,7 +47,7 @@ public class UsuarioController {
         return ResponseEntity.ok("Senha redefinida com sucesso");
     }
 
-    @PreAuthorize("hasRole('COORDENADOR')")
+    @PreAuthorize("hasRole('COORDENADOR')" )
     @PutMapping("/{id}/aprovar-colaborador")
     public ResponseEntity<String> aprovarVinculoColaborador(@PathVariable Long id, Authentication auth) {
         usuarioService.aprovarVinculoColaborador(id, auth.getName());
@@ -102,13 +102,13 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.listarColaboradoresAprovados(empresaId));
     }
 
-    @PreAuthorize("hasRole('COORDENADOR')")
+    @PreAuthorize("hasRole('COORDENADOR') or hasRole('EMPRESA')")
     @GetMapping("/colaboradores")
     public ResponseEntity<List<UsuarioResponseDTO>> listarTodosColaboradores(@RequestParam Long empresaId) {
         return ResponseEntity.ok(usuarioService.listarTodosColaboradores(empresaId));
     }
 
-    @PreAuthorize("hasRole('COORDENADOR')")
+    @PreAuthorize("hasRole('COORDENADOR') or hasRole('EMPRESA')")
     @GetMapping("/coordenadores")
     public ResponseEntity<List<UsuarioResponseDTO>> listarCoordenadores(@RequestParam Long empresaId) {
         List<UsuarioResponseDTO> coordenadores = usuarioService.listarCoordenadoresPorEmpresa(empresaId);
